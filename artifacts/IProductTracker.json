@@ -1,0 +1,168 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"goerli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"deployedBytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"gasEstimates": null,
+		"methodIdentifiers": {
+			"registerProduct(uint256,string,string,string)": "700bd66e",
+			"transferCustody(uint256,address)": "815fc9bb",
+			"updateProductStatus(uint256,string)": "ba429578",
+			"verifyProduct(uint256)": "524e8462"
+		}
+	},
+	"abi": [
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "productId",
+					"type": "uint256"
+				},
+				{
+					"internalType": "string",
+					"name": "name",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "origin",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "batchNumber",
+					"type": "string"
+				}
+			],
+			"name": "registerProduct",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "productId",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "newOwner",
+					"type": "address"
+				}
+			],
+			"name": "transferCustody",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "productId",
+					"type": "uint256"
+				},
+				{
+					"internalType": "string",
+					"name": "newStatus",
+					"type": "string"
+				}
+			],
+			"name": "updateProductStatus",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "productId",
+					"type": "uint256"
+				}
+			],
+			"name": "verifyProduct",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "name",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "origin",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "batchNumber",
+					"type": "string"
+				},
+				{
+					"internalType": "address",
+					"name": "currentOwner",
+					"type": "address"
+				},
+				{
+					"internalType": "string",
+					"name": "status",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "createdAt",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		}
+	]
+}
