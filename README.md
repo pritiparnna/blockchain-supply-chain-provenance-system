@@ -71,13 +71,18 @@ blockchain-supply-chain-provenance/
 ├── README.md
 ├── contracts/
 │   ├── SupplyChainProvenance.sol
+│   ├── ProductRegistry.sol
+│   ├── AccessControlManager.sol
 │   └── interfaces/
 │       └── IProductTracker.sol
+│
+├── docs/
+│   └── design-notes.md
 │
 ├── scripts/
 │   └── deploy.js
 │
-├── docs/
-│   └── design-notes.md
+├── test/
+│   └── placeholder-test.js
 │
 └── .gitignore
