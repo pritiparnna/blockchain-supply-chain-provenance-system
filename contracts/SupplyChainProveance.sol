@@ -1,124 +1,92 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "./ProductRegistry.sol";
+import "./AccessControlManager.sol";
 import "./interfaces/IProductTracker.sol";
 
 /// @title SupplyChainProvenance
-/// @notice Draft smart contract for tracking product provenance in a supply chain.
-/// @dev This draft focuses on structure, interfaces, and intended behavior rather than full production functionality.
-contract SupplyChainProvenance is IProductTracker {
-
-    /// @notice Represents the current lifecycle stage of a product.
-    enum ProductStage {
-        Created,
-        InTransit,
-        Received,
-        Delivered
-    }
-
-    /// @notice Represents a product tracked by the system.
-    /// @dev Stores key information needed for provenance tracking.
-    struct Product {
-        uint256 productId;
-        string name;
-        string origin;
-        string batchNumber;
-        address currentOwner;
-        string currentStatus;
-        uint256 createdAt;
-        bool exists;
-    }
-
-    /// @notice Stores all registered products by product ID.
-    mapping(uint256 => Product) private products;
-
-    /// @notice Tracks stakeholder roles for future access control.
-    /// @dev This is a draft structure and may be expanded later with more robust RBAC.
-    mapping(address => string) public stakeholderRoles;
-
-    /// @notice Emitted when a new product is registered.
+/// @notice Main smart contract for a blockchain-based supply chain provenance system
+/// @dev This draft focuses on clear structure, function signatures, and intended behavior
+contract SupplyChainProvenance is
+    ProductRegistry,
+    AccessControlManager,
+    IProductTracker
+{
+    /// @notice Emitted when a new product is registered
     event ProductRegistered(
         uint256 indexed productId,
         string name,
         string origin,
-        string batchNumber,
-        address indexed registeredBy
+        address indexed owner
     );
 
-    /// @notice Emitted when product custody is transferred.
-    event CustodyTransferred(
+    /// @notice Emitted when custody/ownership of a product is transferred
+    event OwnershipTransferred(
         uint256 indexed productId,
         address indexed previousOwner,
         address indexed newOwner
     );
 
-    /// @notice Emitted when the status of a product is updated.
-    event ProductStatusUpdated(
+    /// @notice Emitted when a product status is updated
+    event StatusUpdated(
         uint256 indexed productId,
-        string newStatus,
+        string status,
         address indexed updatedBy
     );
 
-    /// @notice Assigns a role label to a stakeholder.
-    /// @dev In a complete implementation, role management should use stronger access control.
-    function assignRole(address stakeholder, string memory role) public {
-        stakeholderRoles[stakeholder] = role;
-    }
-
-    /// @notice Registers a new product on the blockchain.
-    /// @dev This function is intended to be called by a producer or manufacturer.
-    /// It creates the initial provenance record for the product.
+    /// @notice Registers a new product on the blockchain
+    /// @dev The caller becomes the initial owner of the product
     function registerProduct(
         uint256 productId,
         string calldata name,
-        string calldata origin,
-        string calldata batchNumber
+        string calldata origin
     ) external override {
-        require(!products[productId].exists, "Product already exists");
+        Product memory existingProduct = _getProduct(productId);
+        require(existingProduct.owner == address(0), "Product already exists");
 
-        products[productId] = Product({
-            productId: productId,
-            name: name,
-            origin: origin,
-            batchNumber: batchNumber,
-            currentOwner: msg.sender,
-            currentStatus: "Created",
-            createdAt: block.timestamp,
-            exists: true
-        });
+        _registerProduct(productId, name, origin, msg.sender);
 
-        emit ProductRegistered(productId, name, origin, batchNumber, msg.sender);
+        emit ProductRegistered(productId, name, origin, msg.sender);
     }
 
-    /// @notice Transfers custody or ownership of a product to another stakeholder.
-    /// @dev In a later version, this should include stricter access checks and role validation.
+    /// @notice Transfers custody or ownership of a product to another stakeholder
+    /// @dev Only the current owner can transfer the product
     function transferCustody(
         uint256 productId,
         address newOwner
     ) external override {
-        require(products[productId].exists, "Product does not exist");
-        require(products[productId].currentOwner == msg.sender, "Only current owner can transfer");
+        Product memory product = _getProduct(productId);
 
-        address previousOwner = products[productId].currentOwner;
-        products[productId].currentOwner = newOwner;
+        require(product.owner != address(0), "Product does not exist");
+        require(product.owner == msg.sender, "Only current owner can transfer");
+        require(newOwner != address(0), "Invalid new owner address");
 
-        emit CustodyTransferred(productId, previousOwner, newOwner);
+        address previousOwner = product.owner;
+
+        _transfer(productId, newOwner);
+
+        emit OwnershipTransferred(productId, previousOwner, newOwner);
     }
 
-    /// @notice Updates the status of a product as it moves through the supply chain.
-    /// @dev Example statuses: Created, Shipped, Received, Delivered.
-    function updateProductStatus(
+    /// @notice Updates the lifecycle status of a product
+    /// @dev Only the current owner can update the status
+    function updateStatus(
         uint256 productId,
-        string calldata newStatus
+        string calldata status
     ) external override {
-        require(products[productId].exists, "Product does not exist");
-        require(products[productId].currentOwner == msg.sender, "Only current owner can update status");
+        Product memory product = _getProduct(productId);
 
-        products[productId].currentStatus = newStatus;
+        require(product.owner != address(0), "Product does not exist");
+        require(product.owner == msg.sender, "Only current owner can update status");
 
-        emit ProductStatusUpdated(productId, newStatus, msg.sender);
+        _updateStatus(productId, status);
+
+        emit StatusUpdated(productId, status, msg.sender);
     }
 
-    /// @notice Returns product details for provenance verification.
-    /// @dev Consumers, retailers, or regulators can use this function to inspect product information.
-    function verifyProduct(
+    /// @notice Returns basic product details
+    function getProduct(
         uint256 productId
     )
         external
@@ -126,24 +94,42 @@ contract SupplyChainProvenance is IProductTracker {
         override
         returns (
             string memory name,
-            string memory origin,
-            string memory batchNumber,
-            address currentOwner,
-            string memory status,
-            uint256 createdAt
+            address owner,
+            string memory status
         )
     {
-        require(products[productId].exists, "Product does not exist");
+        Product memory p = _getProduct(productId);
+        require(p.owner != address(0), "Product does not exist");
 
-        Product memory p = products[productId];
+        return (p.name, p.owner, p.status);
+    }
+
+    /// @notice Verifies product authenticity and returns provenance details
+    /// @dev Intended for consumers, retailers, and regulators
+    function verifyProduct(
+        uint256 productId
+    )
+        external
+        view
+        override
+        returns (
+            uint256 id,
+            string memory name,
+            string memory origin,
+            address owner,
+            string memory status,
+            bool exists
+        )
+    {
+        Product memory p = _getProduct(productId);
 
         return (
+            p.id,
             p.name,
             p.origin,
-            p.batchNumber,
-            p.currentOwner,
-            p.currentStatus,
-            p.createdAt
+            p.owner,
+            p.status,
+            p.owner != address(0)
         );
     }
 }
