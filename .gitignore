@@ -1,0 +1,42 @@
+# Node.js dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Hardhat / Truffle build files
+artifacts/
+cache/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage reports
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Solidity compiler outputs (optional)
+*.bin
+*.abi
+
+# Lock files (optional depending on team choice)
+# package-lock.json
+# yarn.lock
