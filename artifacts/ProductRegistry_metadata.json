@@ -1,0 +1,47 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"title": "Product Registry",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"notice": "Stores product information",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/ProductRegistry.sol": "ProductRegistry"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/ProductRegistry.sol": {
+			"keccak256": "0xb305057f50127f3f22741100ac460eb88fa818ce132ce7879007067e971c07be",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0cb83eadf9e6018f03c3e6454f4f2dc8aad8fae2275217dc16b5205fd20afe32",
+				"dweb:/ipfs/QmWnhVx5pLy8wc4UhwUwFQaj9cCNyqnG6AnbAbeuQnKX9F"
+			]
+		}
+	},
+	"version": 1
+}
